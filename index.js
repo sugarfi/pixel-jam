@@ -632,5 +632,5 @@ scene("boss-intro", () => {
     });
 });
 
-//start("title");
-start("end");
+start("title");
+//start("end");
