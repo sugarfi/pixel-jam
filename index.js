@@ -203,8 +203,19 @@ scene("how", () => {
             destroy(cont);
             nextMsg();
         } else {
-            go("level1-intro");
+            go("click");
         }
+    });
+});
+
+scene("click", () => {
+    add([
+        text("please click on\nthis page to continue.", 10),
+        pos(width() / 2, height() / 2)
+    ]);
+    mouseDown(() => {
+        Tone.context.resume();
+        go("level1-intro");
     });
 });
 
