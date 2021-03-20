@@ -383,13 +383,15 @@ const makeLevel = (levelName, enemySprite, enemySpeed, enemyMax, filename, next,
         Midi.fromUrl(filename).then(midi => {
             const ac = new AudioContext();
             console.log(midi.tracks);
+            const len = lower * 4 * interval + 13;
+            console.log(len);
             midi.tracks.forEach((track, test) => {
                 if (track.instrument.name) {
                     Soundfont.instrument(ac, track.instrument.name.replace(/ /g, '_').replace(/[\(\)]/g, ''), {
                         soundfont: sf,
                     }).then(synth => {
                         let recent = [];
-                        track.notes.forEach((note, i) => {
+                        track.notes.slice(0, len).forEach((note, i) => {
                             if (test == trackNum && (i % interval == 0)) {
                                 if (!recent.includes(note.time)) {
                                     if (recent.length > 5) {
@@ -405,11 +407,24 @@ const makeLevel = (levelName, enemySprite, enemySpeed, enemyMax, filename, next,
                                 synth.play(note.midi, ac.currentTime, { duration: note.duration });
                             }, note.time);
                         });
+                    }).catch(e => {
+                        let recent = [];
+                        if (test == trackNum && (i % interval == 0)) {
+                            if (!recent.includes(note.time)) {
+                                if (recent.length > 5) {
+                                    recent.shift();
+                                }
+                                recent.push(note.time);
+                                Tone.Transport.schedule(time => {
+                                    nextNote(NOTE_NAMES[note.name[0]]);
+                                }, note.time);
+                            }
+                        }
                     });
                 }
             });
 
-            wait(10, () => {
+            wait(7, () => {
                 Tone.Transport.start();
             });
         });
